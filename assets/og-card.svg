@@ -1,0 +1,24 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="32" fill="#08131A"/>
+  <rect x="36" y="36" width="1128" height="558" rx="28" fill="url(#paint0_linear_1_2)" fill-opacity="0.16" stroke="rgba(255,255,255,0.12)"/>
+  <circle cx="1000" cy="132" r="120" fill="url(#paint1_radial_1_2)"/>
+  <circle cx="220" cy="560" r="160" fill="url(#paint2_radial_1_2)"/>
+  <path d="M92 150H252V185H181L132 248H252V284H91L166 193L92 150Z" fill="white"/>
+  <text x="92" y="370" fill="white" font-size="84" font-family="Arial, Helvetica, sans-serif" font-weight="700">Precision in Every Fiber.</text>
+  <text x="92" y="438" fill="#B7C6CC" font-size="28" font-family="Arial, Helvetica, sans-serif">NABL-accredited textile testing, inspection, and quality assurance solutions.</text>
+  <text x="92" y="500" fill="#8FDBEE" font-size="24" font-family="Arial, Helvetica, sans-serif">SHINE</text>
+  <defs>
+    <linearGradient id="paint0_linear_1_2" x1="36" y1="36" x2="1164" y2="594" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A73D8"/>
+      <stop offset="1" stop-color="#0AA8C8"/>
+    </linearGradient>
+    <radialGradient id="paint1_radial_1_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1000 132) rotate(90) scale(120)">
+      <stop stop-color="#0AA8C8"/>
+      <stop offset="1" stop-color="#0AA8C8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paint2_radial_1_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(220 560) rotate(90) scale(160)">
+      <stop stop-color="#0A73D8"/>
+      <stop offset="1" stop-color="#0A73D8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

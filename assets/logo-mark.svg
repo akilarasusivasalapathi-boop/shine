@@ -1,0 +1,16 @@
+<svg width="320" height="96" viewBox="0 0 320 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="96" rx="48" fill="#F4F7F8"/>
+  <rect x="4" y="4" width="312" height="88" rx="44" fill="url(#paint0_linear_1_2)" fill-opacity="0.12" stroke="rgba(8,19,26,0.1)"/>
+  <text x="28" y="60" fill="#08131A" font-size="38" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="10">SHINE</text>
+  <circle cx="281" cy="48" r="10" fill="url(#paint1_linear_1_2)"/>
+  <defs>
+    <linearGradient id="paint0_linear_1_2" x1="4" y1="4" x2="316" y2="92" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A73D8"/>
+      <stop offset="1" stop-color="#0AA8C8"/>
+    </linearGradient>
+    <linearGradient id="paint1_linear_1_2" x1="271" y1="38" x2="291" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A73D8"/>
+      <stop offset="1" stop-color="#0AA8C8"/>
+    </linearGradient>
+  </defs>
+</svg>
