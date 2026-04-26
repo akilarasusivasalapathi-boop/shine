@@ -209,10 +209,8 @@
 }
 
 @media (max-width: 520px) {
-    .brand__wordmark {
-        letter-spacing: 0.12em;
-        padding: 0.48rem 0.72rem 0.44rem;
-        font-size: 0.92rem;
+    .brand__logo {
+        height: 48px;
     }
 
     .brand__descriptor {

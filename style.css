@@ -220,17 +220,11 @@ p {
     min-width: 0;
 }
 
-.brand__wordmark {
-    display: inline-block;
-    padding: 0.5rem 0.85rem 0.46rem;
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(10, 115, 216, 0.12), rgba(10, 168, 200, 0.2));
-    border: 1px solid rgba(8, 19, 26, 0.08);
-    color: var(--ink);
-    font-size: 1rem;
-    font-weight: 900;
-    letter-spacing: 0.18em;
-    line-height: 1;
+.brand__logo {
+    width: auto;
+    height: 58px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
 .brand__descriptor {
