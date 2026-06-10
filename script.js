@@ -58,7 +58,7 @@ if (contactForm && formStatus) {
         formStatus.textContent = "Enquiry submitted successfully. We will get back to you shortly.";
     }
     if (!isFileProtocol && params.get("contact") === "error") {
-        formStatus.textContent = "Submission failed. Please try again or contact hello@shine-lab.in.";
+        formStatus.textContent = "Submission failed. Please try again or contact info@shine-india.com.";
     }
 
     contactForm.addEventListener("submit", async (event) => {
@@ -82,7 +82,7 @@ if (contactForm && formStatus) {
             );
 
             formStatus.textContent = "Opened your email app for submission. For live API delivery, run the local server or deploy to Cloud Run.";
-            window.location.href = `mailto:hello@shine-lab.in?subject=${subject}&body=${body}`;
+            window.location.href = `mailto:info@shine-india.com?subject=${subject}&body=${body}`;
             return;
         }
 

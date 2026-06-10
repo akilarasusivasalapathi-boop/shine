@@ -14,6 +14,7 @@ const MIME_TYPES = {
     ".ico": "image/x-icon",
     ".js": "application/javascript; charset=utf-8",
     ".json": "application/json; charset=utf-8",
+    ".pdf": "application/pdf",
     ".svg": "image/svg+xml",
     ".txt": "text/plain; charset=utf-8",
     ".webmanifest": "application/manifest+json; charset=utf-8",
