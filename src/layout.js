@@ -68,9 +68,9 @@ ${renderNav(active)}
                 </nav>
 
                 <div class="header-actions">
-                    <a class="button button--sm header-cta" href="/contact.html">
-                        <span>Request a Quote</span>
-                        <span class="button__icon" aria-hidden="true">&rarr;</span>
+                    <a class="button button--sm header-cta" href="/assets/shine-india-brochure.pdf" download>
+                        <span>Download Brochure</span>
+                        <span class="button__icon" aria-hidden="true">&darr;</span>
                     </a>
 
                     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu" data-menu-toggle>
@@ -124,7 +124,7 @@ const footer = () => {
                         <address>
                             <a class="footer-contact__row" href="https://maps.google.com/?q=${encodeURIComponent(company.address)}" target="_blank" rel="noopener">
                                 <span class="footer-contact__icon" aria-hidden="true">${icons.pin}</span>
-                                <span><strong>${esc(company.shortName)}</strong><br>${esc(company.address)}</span>
+                                <span><strong>${esc(company.legalName)}</strong><br>${esc(company.address)}</span>
                             </a>
                             <a class="footer-contact__row" href="tel:${company.phoneHref}">
                                 <span class="footer-contact__icon" aria-hidden="true">${icons.phone}</span>

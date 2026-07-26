@@ -172,7 +172,7 @@ const contactRail = () => `                    <div class="contact-rail reveal">
                             <span class="contact-tile__icon">${icon.pin}</span>
                             <span>
                                 <p>Visit</p>
-                                <strong>${esc(company.shortName)}</strong>
+                                <strong>${esc(company.legalName)}</strong>
                                 <span>${esc(company.address)}</span>
                             </span>
                         </a>
