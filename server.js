@@ -12,12 +12,17 @@ const MIME_TYPES = {
     ".css": "text/css; charset=utf-8",
     ".html": "text/html; charset=utf-8",
     ".ico": "image/x-icon",
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
     ".js": "application/javascript; charset=utf-8",
     ".json": "application/json; charset=utf-8",
     ".pdf": "application/pdf",
+    ".png": "image/png",
     ".svg": "image/svg+xml",
     ".txt": "text/plain; charset=utf-8",
     ".webmanifest": "application/manifest+json; charset=utf-8",
+    ".webp": "image/webp",
+    ".woff2": "font/woff2",
     ".xml": "application/xml; charset=utf-8"
 };
 
@@ -81,24 +86,44 @@ const getBaseUrl = (req) => {
     return `${forwardedProto}://${host}`;
 };
 
+const sendNotFound = (req, res) => {
+    const page = path.join(ROOT_DIR, "404.html");
+
+    fs.readFile(page, (readError, contents) => {
+        if (readError) {
+            sendText(res, 404, "Not found");
+            return;
+        }
+
+        res.writeHead(404, withSecurityHeaders({
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "no-store",
+            "Content-Length": contents.length
+        }));
+        res.end(contents);
+    });
+};
+
 const serveStaticFile = (req, res, filePath) => {
     const resolved = path.resolve(ROOT_DIR, filePath);
-    if (!resolved.startsWith(ROOT_DIR)) {
+    if (resolved !== ROOT_DIR && !resolved.startsWith(ROOT_DIR + path.sep)) {
         sendText(res, 403, "Forbidden");
         return;
     }
 
     fs.stat(resolved, (statError, stats) => {
         if (statError || !stats.isFile()) {
-            sendText(res, 404, "Not found");
+            sendNotFound(req, res);
             return;
         }
 
         const ext = path.extname(resolved).toLowerCase();
         const type = MIME_TYPES[ext] || "application/octet-stream";
-        const cacheControl = /^(\.svg|\.css|\.js)$/.test(ext)
-            ? "public, max-age=31536000, immutable"
-            : "public, max-age=3600";
+        /* Filenames carry no content hash, so anything that can change on a
+           deploy (HTML, CSS, JS) must revalidate. Only media is cached hard. */
+        const cacheControl = /^(\.jpg|\.jpeg|\.png|\.webp|\.svg|\.pdf|\.woff2|\.ico)$/.test(ext)
+            ? "public, max-age=2592000"
+            : "public, max-age=0, must-revalidate";
 
         res.writeHead(200, withSecurityHeaders({
             "Content-Type": type,
@@ -108,6 +133,22 @@ const serveStaticFile = (req, res, filePath) => {
 
         fs.createReadStream(resolved).pipe(res);
     });
+};
+
+/* Resolve a request path to a file on disk, accepting extensionless URLs
+   (/about and /services/chemical-safety) as well as explicit .html. */
+const resolvePage = (pathname) => {
+    const clean = pathname.replace(/^\/+/, "").replace(/\/+$/, "");
+
+    if (clean === "" || clean === "index.html") return "index.html";
+    if (path.extname(clean)) return clean;
+
+    const candidate = path.resolve(ROOT_DIR, `${clean}.html`);
+    if (candidate.startsWith(ROOT_DIR + path.sep) && fs.existsSync(candidate)) {
+        return `${clean}.html`;
+    }
+
+    return clean;
 };
 
 const parseSubmission = (rawBody, contentType = "") => {
@@ -183,26 +224,6 @@ const server = http.createServer(async (req, res) => {
             return json(res, 200, { ok: true });
         }
 
-        if (pathname === "/robots.txt") {
-            const baseUrl = getBaseUrl(req);
-            return sendText(
-                res,
-                200,
-                `User-agent: *\nAllow: /\nSitemap: ${baseUrl}/sitemap.xml\n`,
-                "text/plain; charset=utf-8"
-            );
-        }
-
-        if (pathname === "/sitemap.xml") {
-            const baseUrl = getBaseUrl(req);
-            return sendText(
-                res,
-                200,
-                `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${baseUrl}/</loc>\n  </url>\n</urlset>\n`,
-                "application/xml; charset=utf-8"
-            );
-        }
-
         if (pathname === "/api/contact" && req.method === "POST") {
             const rawBody = await readBody(req);
             const payload = parseSubmission(rawBody, req.headers["content-type"] || "");
@@ -224,12 +245,11 @@ const server = http.createServer(async (req, res) => {
             return redirect(res, "/?contact=success#contact");
         }
 
-        if (pathname === "/" || pathname === "/index.html") {
-            return serveStaticFile(req, res, "index.html");
+        if (req.method !== "GET" && req.method !== "HEAD") {
+            return sendText(res, 405, "Method not allowed");
         }
 
-        const safePath = pathname.replace(/^\/+/, "");
-        return serveStaticFile(req, res, safePath);
+        return serveStaticFile(req, res, resolvePage(decodeURIComponent(pathname)));
     } catch (error) {
         const wantsJson = (req.headers.accept || "").includes("application/json");
         const message = error instanceof Error ? error.message : "Unexpected server error";

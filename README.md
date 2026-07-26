@@ -1,24 +1,54 @@
 # SHINE Website
 
-Static marketing website for SHINE, built in the same simple root-file format as the Loramind reference site and ready to deploy on Google Cloud Run.
+Multi-page marketing website for **Shine Testing Services India (OPC) Pvt Ltd**,
+ready to deploy on Google Cloud Run or any static host.
 
 ## Structure
 
-- `index.html` - page markup and SEO metadata
-- `style.css` - desktop and shared styles
-- `mobile.css` - responsive overrides
-- `script.js` - menu, reveal animation, and async form submission
-- `assets/` - local SVG brand and preview assets
-- `server.js` - static file server plus `/api/contact`
-- `Dockerfile` - Cloud Run container image
+Pages are **generated** from `src/` into HTML at the repo root. Edit the sources,
+not the generated `.html` files — a rebuild overwrites them.
+
+- `src/site.js` — company details, navigation, service and industry data (single source of truth)
+- `src/layout.js` — page shell: `<head>`, header/nav, footer, structured data
+- `src/components.js` — reusable blocks (service cards, CTA band, contact form, icons)
+- `src/pages.js` — per-page content
+- `build.js` — renders every page plus `sitemap.xml` and `robots.txt`
+- `style.css` — the full design system (tokens, components, responsive)
+- `script.js` — nav drawer, dropdowns, accordions, scroll reveal, async form
+- `assets/img/` — site photography
+- `brochure/` — brochure source (`brochure.html` + `build-pdf.sh`) which renders `assets/shine-india-brochure.pdf`
+- `server.js` — static file server, clean URLs, 404 page, and `/api/contact`
+- `Dockerfile` — Cloud Run container image
+
+Generated at the repo root: `index.html`, `about.html`, `services.html`,
+`services/*.html` (6), `industries.html`, `resources.html`, `why-shine.html`,
+`contact.html`, `404.html`, `sitemap.xml`, `robots.txt`.
 
 ## Local Run
 
 ```bash
-node server.js
+npm run build    # regenerate HTML from src/
+npm run serve    # serve on http://localhost:8080
+npm start        # build, then serve
 ```
 
-Open `http://localhost:8080`.
+Both `/about` and `/about.html` resolve, so the site works behind `server.js`
+and on a plain static host.
+
+## Adding or Editing a Service
+
+Add an entry to the `services` array in `src/site.js` and run `npm run build`.
+The nav dropdown, services hub, footer, homepage grid, sitemap, and a full
+detail page with FAQ schema are all generated from it.
+
+## Brochure
+
+```bash
+cd brochure && ./build-pdf.sh
+```
+
+Renders the 4-page A4 landscape PDF to `assets/shine-india-brochure.pdf` using
+headless Chrome. Override the browser path with `CHROME=/path/to/chrome`.
 
 ## Environment Variables
 

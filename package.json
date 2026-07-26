@@ -2,9 +2,11 @@
   "name": "shine-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Production-ready SHINE static website with a Cloud Run contact endpoint.",
+  "description": "SHINE Testing Services — multi-page static site with a Cloud Run contact endpoint.",
   "scripts": {
-    "start": "node server.js"
+    "build": "node build.js",
+    "start": "node build.js && node server.js",
+    "serve": "node server.js"
   },
   "engines": {
     "node": ">=20"

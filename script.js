@@ -1,132 +1,201 @@
-const header = document.querySelector("[data-header]");
-const parallaxTarget = document.querySelector("[data-parallax]");
-const revealItems = document.querySelectorAll(".reveal");
-const menuToggle = document.querySelector("[data-menu-toggle]");
-const siteNav = document.querySelector("[data-site-nav]");
-const contactForm = document.querySelector("[data-contact-form]");
-const formStatus = document.querySelector("[data-form-status]");
-const isFileProtocol = window.location.protocol === "file:";
+/* SHINE — interaction layer. Progressive enhancement only: every page works
+   without this file, it just becomes less pleasant. */
 
-const syncHeaderState = () => {
-    if (!header) return;
-    header.classList.toggle("is-scrolled", window.scrollY > 16);
-};
+(function () {
+    "use strict";
 
-const syncParallax = () => {
-    if (!parallaxTarget) return;
-    const offset = Math.min(window.scrollY * 0.12, 44);
-    parallaxTarget.style.transform = `translate3d(0, ${offset}px, 0)`;
-};
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var isDesktop = function () { return window.matchMedia("(min-width: 961px)").matches; };
 
-const closeMenu = () => {
-    if (!menuToggle || !siteNav) return;
-    menuToggle.setAttribute("aria-expanded", "false");
-    menuToggle.classList.remove("is-active");
-    siteNav.classList.remove("is-open");
-};
+    /* --- Header shadow on scroll ------------------------------------- */
 
-if ("IntersectionObserver" in window) {
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
+    var header = document.querySelector("[data-header]");
+    var toTop = document.querySelector("[data-to-top]");
+
+    var onScroll = function () {
+        var y = window.scrollY;
+        if (header) header.classList.toggle("is-stuck", y > 12);
+        if (toTop) toTop.classList.toggle("is-visible", y > 700);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    if (toTop) {
+        toTop.addEventListener("click", function () {
+            window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
         });
-    }, { threshold: 0.18 });
-
-    revealItems.forEach((item) => revealObserver.observe(item));
-} else {
-    revealItems.forEach((item) => item.classList.add("is-visible"));
-}
-
-if (menuToggle && siteNav) {
-    menuToggle.addEventListener("click", () => {
-        const expanded = menuToggle.getAttribute("aria-expanded") === "true";
-        menuToggle.setAttribute("aria-expanded", String(!expanded));
-        menuToggle.classList.toggle("is-active", !expanded);
-        siteNav.classList.toggle("is-open", !expanded);
-    });
-
-    siteNav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", closeMenu);
-    });
-}
-
-if (contactForm && formStatus) {
-    const params = new URLSearchParams(window.location.search);
-    if (!isFileProtocol && params.get("contact") === "success") {
-        formStatus.textContent = "Enquiry submitted successfully. We will get back to you shortly.";
-    }
-    if (!isFileProtocol && params.get("contact") === "error") {
-        formStatus.textContent = "Submission failed. Please try again or contact info@shine-india.com.";
     }
 
-    contactForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const formData = new FormData(contactForm);
-        const payload = Object.fromEntries(formData.entries());
-        const submitButton = contactForm.querySelector("button[type='submit']");
+    /* --- Services dropdown (click on mobile, hover via CSS on desktop) -- */
 
-        if (isFileProtocol) {
-            const subject = encodeURIComponent(`SHINE enquiry: ${payload.service || "Website enquiry"}`);
-            const body = encodeURIComponent(
-                [
-                    `Name: ${payload.name || ""}`,
-                    `Company: ${payload.company || ""}`,
-                    `Email: ${payload.email || ""}`,
-                    `Service: ${payload.service || ""}`,
-                    "",
-                    "Project Brief:",
-                    payload.message || ""
-                ].join("\n")
-            );
+    function closeDropdown(item) {
+        item.classList.remove("is-open");
+        var btn = item.querySelector("[data-dropdown-toggle]");
+        if (btn) btn.setAttribute("aria-expanded", "false");
+    }
 
-            formStatus.textContent = "Opened your email app for submission. For live API delivery, run the local server or deploy to Cloud Run.";
-            window.location.href = `mailto:info@shine-india.com?subject=${subject}&body=${body}`;
-            return;
-        }
+    document.querySelectorAll("[data-dropdown]").forEach(function (item) {
+        var btn = item.querySelector("[data-dropdown-toggle]");
+        if (!btn) return;
 
-        formStatus.textContent = "Submitting your enquiry...";
-        if (submitButton) submitButton.disabled = true;
+        btn.addEventListener("click", function () {
+            var open = !item.classList.contains("is-open");
+            item.classList.toggle("is-open", open);
+            btn.setAttribute("aria-expanded", String(open));
+        });
+    });
 
-        try {
-            const response = await fetch("api/contact", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
+    /* --- Mobile drawer ------------------------------------------------ */
 
-            const result = await response.json();
+    var toggle = document.querySelector("[data-menu-toggle]");
+    var nav = document.querySelector("[data-site-nav]");
+    var scrim = document.querySelector("[data-nav-scrim]");
 
-            if (!response.ok) {
-                throw new Error(result.error || "Unable to submit enquiry");
+    var setDrawer = function (open) {
+        if (!toggle || !nav) return;
+        toggle.setAttribute("aria-expanded", String(open));
+        toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        nav.classList.toggle("is-open", open);
+        document.body.classList.toggle("is-locked", open);
+
+        if (scrim) {
+            if (open) {
+                scrim.hidden = false;
+                requestAnimationFrame(function () { scrim.classList.add("is-visible"); });
+            } else {
+                scrim.classList.remove("is-visible");
+                setTimeout(function () { scrim.hidden = true; }, 350);
             }
-
-            contactForm.reset();
-            formStatus.textContent = result.message || "Enquiry submitted successfully.";
-        } catch (error) {
-            formStatus.textContent = error.message || "Submission failed. Please try again later.";
-        } finally {
-            if (submitButton) submitButton.disabled = false;
         }
-    });
-}
+    };
 
-window.addEventListener("scroll", () => {
-    syncHeaderState();
-    syncParallax();
-}, { passive: true });
-
-window.addEventListener("resize", () => {
-    if (window.innerWidth > 900) {
-        closeMenu();
+    if (toggle) {
+        toggle.addEventListener("click", function () {
+            setDrawer(toggle.getAttribute("aria-expanded") !== "true");
+        });
     }
-});
 
-window.addEventListener("load", () => {
-    syncHeaderState();
-    syncParallax();
-});
+    if (scrim) scrim.addEventListener("click", function () { setDrawer(false); });
+
+    document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        setDrawer(false);
+        document.querySelectorAll("[data-dropdown].is-open").forEach(closeDropdown);
+    });
+
+    /* Reset drawer state when crossing the desktop breakpoint, so the nav
+       never ends up hidden-but-open after a resize. */
+    var wasDesktop = isDesktop();
+    window.addEventListener("resize", function () {
+        var nowDesktop = isDesktop();
+        if (nowDesktop === wasDesktop) return;
+        wasDesktop = nowDesktop;
+        setDrawer(false);
+        document.querySelectorAll("[data-dropdown].is-open").forEach(closeDropdown);
+    });
+
+    /* --- Accordions ---------------------------------------------------- */
+
+    document.querySelectorAll("[data-accordion]").forEach(function (group) {
+        group.querySelectorAll(".accordion__trigger").forEach(function (trigger) {
+            trigger.addEventListener("click", function () {
+                var item = trigger.closest(".accordion__item");
+                var open = !item.classList.contains("is-open");
+
+                /* One panel open at a time reads more calmly than many. */
+                group.querySelectorAll(".accordion__item.is-open").forEach(function (other) {
+                    if (other === item) return;
+                    other.classList.remove("is-open");
+                    other.querySelector(".accordion__trigger").setAttribute("aria-expanded", "false");
+                });
+
+                item.classList.toggle("is-open", open);
+                trigger.setAttribute("aria-expanded", String(open));
+            });
+        });
+    });
+
+    /* --- Reveal on scroll ---------------------------------------------- */
+
+    var revealables = document.querySelectorAll(".reveal");
+
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+        revealables.forEach(function (el) { el.classList.add("is-visible"); });
+    } else {
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry, i) {
+                if (!entry.isIntersecting) return;
+                /* Small stagger so a grid animates in as a group, not a wall. */
+                setTimeout(function () { entry.target.classList.add("is-visible"); }, i * 70);
+                observer.unobserve(entry.target);
+            });
+        }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+
+        revealables.forEach(function (el) { observer.observe(el); });
+    }
+
+    /* --- Contact form -------------------------------------------------- */
+
+    var form = document.querySelector("[data-contact-form]");
+
+    if (form) {
+        var status = form.querySelector("[data-form-status]");
+        var submit = form.querySelector('button[type="submit"]');
+
+        var setStatus = function (message, state) {
+            if (!status) return;
+            status.textContent = message;
+            if (state) {
+                status.setAttribute("data-state", state);
+            } else {
+                status.removeAttribute("data-state");
+            }
+        };
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            if (!form.reportValidity()) return;
+
+            var label = submit ? submit.innerHTML : "";
+            if (submit) {
+                submit.disabled = true;
+                submit.innerHTML = "<span>Sending&hellip;</span>";
+            }
+            setStatus("");
+
+            fetch(form.action, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Accept: "application/json" },
+                body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+            })
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        return { ok: response.ok, data: data };
+                    });
+                })
+                .then(function (result) {
+                    if (!result.ok) throw new Error(result.data.error || "Something went wrong.");
+                    setStatus(result.data.message || "Enquiry submitted. We will get back to you shortly.", "success");
+                    form.reset();
+                })
+                .catch(function (error) {
+                    setStatus(error.message + " You can also email us directly at info@shine-india.com.", "error");
+                })
+                .finally(function () {
+                    if (submit) {
+                        submit.disabled = false;
+                        submit.innerHTML = label;
+                    }
+                });
+        });
+
+        /* Surface the redirect-based result when JS submission was not used. */
+        var params = new URLSearchParams(window.location.search);
+        if (params.get("contact") === "success") {
+            setStatus("Enquiry submitted. We will get back to you shortly.", "success");
+        } else if (params.get("contact") === "error") {
+            setStatus("We could not submit that. Please try again or email us directly.", "error");
+        }
+    }
+})();
