@@ -168,12 +168,12 @@ ${services.map((s) => `                                <option${preselect === s.
                     </form>`;
 
 const contactRail = () => `                    <div class="contact-rail reveal">
-                        <a class="contact-tile" href="https://maps.google.com/?q=${encodeURIComponent(company.address)}" target="_blank" rel="noopener">
+                        <a class="contact-tile" href="https://maps.google.com/?q=${encodeURIComponent(company.mapQuery)}" target="_blank" rel="noopener">
                             <span class="contact-tile__icon">${icon.pin}</span>
                             <span>
                                 <p>Visit</p>
                                 <strong>${esc(company.legalName)}</strong>
-                                <span>${esc(company.address)}</span>
+                                <span>${company.addressLines.map(esc).join("<br>")}</span>
                             </span>
                         </a>
                         <a class="contact-tile" href="tel:${company.phoneHref}">
@@ -195,7 +195,7 @@ const contactRail = () => `                    <div class="contact-rail reveal">
                         <div class="map-frame">
                             <iframe
                                 title="${esc(company.shortName)} location map"
-                                src="https://www.google.com/maps?q=${encodeURIComponent(company.address)}&z=11&output=embed"
+                                src="https://www.google.com/maps?q=${encodeURIComponent(company.mapQuery)}&z=16&output=embed"
                                 loading="lazy"
                                 referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>

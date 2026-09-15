@@ -274,7 +274,7 @@ const about = () => ({
                             <img src="/assets/img/about-facility.jpg" alt="Modern textile testing laboratory" loading="lazy" width="1500" height="843">
                             <div class="split__badge">
                                 <span>Based in</span>
-                                <strong>${esc(company.address)}</strong>
+                                <strong>${esc(company.addressShort)}</strong>
                             </div>
                         </div>
 
@@ -787,8 +787,10 @@ const contact = () => ({
             email: company.email,
             address: {
                 "@type": "PostalAddress",
+                streetAddress: company.streetAddress,
                 addressLocality: company.city,
                 addressRegion: company.region,
+                postalCode: company.postalCode,
                 addressCountry: "IN"
             }
         }

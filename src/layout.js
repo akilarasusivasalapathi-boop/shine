@@ -122,9 +122,9 @@ const footer = () => {
                     <div class="footer-contact">
                         <h2 class="footer-nav__title">Get in Touch</h2>
                         <address>
-                            <a class="footer-contact__row" href="https://maps.google.com/?q=${encodeURIComponent(company.address)}" target="_blank" rel="noopener">
+                            <a class="footer-contact__row" href="https://maps.google.com/?q=${encodeURIComponent(company.mapQuery)}" target="_blank" rel="noopener">
                                 <span class="footer-contact__icon" aria-hidden="true">${icons.pin}</span>
-                                <span><strong>${esc(company.legalName)}</strong><br>${esc(company.address)}</span>
+                                <span><strong>${esc(company.legalName)}</strong><br>${company.addressLines.map(esc).join("<br>")}</span>
                             </a>
                             <a class="footer-contact__row" href="tel:${company.phoneHref}">
                                 <span class="footer-contact__icon" aria-hidden="true">${icons.phone}</span>
@@ -179,8 +179,10 @@ const render = ({
         description: "Textile testing, inspection, chemical safety, and quality support services for brands, exporters, and sourcing teams.",
         address: {
             "@type": "PostalAddress",
+            streetAddress: company.streetAddress,
             addressLocality: company.city,
             addressRegion: company.region,
+            postalCode: company.postalCode,
             addressCountry: "IN"
         },
         knowsAbout: ["Textile Testing", "Fabric Quality Assurance", "Chemical Safety", "Inspection and Auditing", "Colorfastness Testing"]

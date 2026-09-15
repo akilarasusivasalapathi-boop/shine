@@ -14,7 +14,19 @@ const company = {
     city: "Tirupur",
     region: "Tamil Nadu",
     country: "India",
-    address: "Tirupur, Tamil Nadu, India"
+    streetAddress: "No.67/80, First Floor, 3rd cross street, Amarjothi Garden, Kangeyam Road",
+    postalCode: "641 604",
+    address: "No.67/80, First Floor, 3rd cross street, Amarjothi Garden, Kangeyam Road, Tirupur - 641 604",
+    addressLines: [
+        "No.67/80, First Floor, 3rd cross street",
+        "Amarjothi Garden, Kangeyam Road",
+        "Tirupur - 641 604"
+    ],
+    addressShort: "Tirupur, Tamil Nadu, India",
+    /* Google fails to geocode the full street line (house no. + floor + cross
+       street) and falls back to a point ~1000 km away, so map links use the
+       locality form, which resolves inside Tirupur. */
+    mapQuery: "Amarjothi Garden, Tirupur, Tamil Nadu 641604"
 };
 
 const services = [
